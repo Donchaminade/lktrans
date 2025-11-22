@@ -10,7 +10,7 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.accent,
       ),
-      scaffoldBackgroundColor: AppColors.background,
+      scaffoldBackgroundColor: const Color.fromARGB(255, 220, 228, 243),
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.primary.withOpacity(0.1), // Vert transparent
         elevation: 0,
@@ -23,35 +23,35 @@ class AppTheme {
         fillColor: AppColors.card,
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.grey, width: 0.5), // Fine border
+          borderRadius: BorderRadius.circular(24),
+          borderSide: const BorderSide(color: Colors.grey, width: 0.5),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.grey, width: 0.5), // Fine border
+          borderRadius: BorderRadius.circular(24),
+          borderSide: const BorderSide(color: Colors.grey, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5), // Highlight on focus
+          borderRadius: BorderRadius.circular(24),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(24),
           borderSide: const BorderSide(color: Colors.red, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(24),
           borderSide: const BorderSide(color: Colors.red, width: 1.5),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white, // Text color on button
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           padding: const EdgeInsets.symmetric(vertical: 14),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          elevation: 5, // Add shadow to button
-          shadowColor: Colors.black.withOpacity(0.2), // Subtle shadow color
+          elevation: 5,
+          shadowColor: Colors.black.withOpacity(0.2),
         ),
       ),
       textTheme: base.textTheme.copyWith(

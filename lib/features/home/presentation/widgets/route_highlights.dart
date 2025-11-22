@@ -24,7 +24,7 @@ class RouteHighlights extends StatelessWidget {
           children: [
             Text(
               "Nos Meilleurs Trajets",
-              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary), // Changed color
             ),
             TextButton(
               onPressed: () {

@@ -166,18 +166,15 @@ class _TicketsScreenState extends State<TicketsScreen> {
                           },
                         ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                    child: LoadingButton(
-                      onPressed: () async {
-                        context.push('/routes'); // Navigates to RouteCatalogScreen
-                      },
-                      text: 'Faire une réservation',
-                    ),
-                  ),
-                ),
-              ],
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(16.0),
+                                                    child: LoadingButton(
+                                                      onPressed: () async {
+                                                        context.push('/reservation-entry'); // Navigates to ReservationEntryPointScreen
+                                                      },
+                                                      text: 'Faire une réservation',
+                                                    ),
+                                                  ),              ],
             ),
           ),
         ],
@@ -201,6 +198,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
         checkmarkColor: Colors.white,
         labelStyle: TextStyle(color: isSelected ? Colors.white : AppColors.textPrimary),
         showCheckmark: false,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), // Consistent rounded corners
       ),
     );
   }

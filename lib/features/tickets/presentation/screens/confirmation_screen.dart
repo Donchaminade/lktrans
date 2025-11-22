@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lktrans/core/constants/app_colors.dart';
+import 'package:lktrans/core/widgets/loading_button.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   const ConfirmationScreen({super.key});
@@ -34,12 +35,12 @@ class ConfirmationScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 48),
-              ElevatedButton(
-                onPressed: () {
+              const SizedBox(height: 80),
+              LoadingButton(
+                onPressed: () async {
                   context.go('/home'); // Go back to home
                 },
-                child: const Text('Retour à l\'accueil'),
+                text: 'Retour à l\'accueil',
               ),
             ],
           ),

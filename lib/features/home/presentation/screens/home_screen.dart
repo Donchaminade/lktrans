@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lktrans/core/constants/app_colors.dart';
 import 'package:lktrans/features/home/presentation/widgets/next_bus_card.dart';
 import 'package:lktrans/features/home/presentation/widgets/promo_carousel.dart';
@@ -101,6 +102,36 @@ class _HomeScreenState extends State<HomeScreen> {
                     : const SizedBox.shrink(),
               ),
               const SizedBox(height: 24),
+              // Quick Action Buttons Section
+              Text(
+                'Actions Rapides',
+                style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildQuickActionButton(
+                    context,
+                    icon: Icons.confirmation_num_outlined,
+                    label: 'Réserver',
+                    onTap: () => context.push('/reservation-entry'),
+                  ),
+                  _buildQuickActionButton(
+                    context,
+                    icon: Icons.airplane_ticket_outlined,
+                    label: 'Mes Tickets',
+                    onTap: () => context.go('/tickets'),
+                  ),
+                //   _buildQuickActionButton(
+                //     context,
+                //     icon: Icons.search,
+                //     label: 'Rechercher',
+                //     onTap: () => context.go('/routes'),
+                //   ),
+                 ],
+              ),
+              const SizedBox(height: 32), // Spacing before RouteHighlights
               const RouteHighlights(),
               const SizedBox(height: 24),
               const PromoCarousel(),
@@ -108,6 +139,23 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildQuickActionButton(BuildContext context, {required IconData icon, required String label, required VoidCallback onTap}) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 28,
+          backgroundColor: AppColors.primary.withOpacity(0.1),
+          child: IconButton(
+            icon: Icon(icon, color: AppColors.primary, size: 24),
+            onPressed: onTap,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textPrimary)),
+      ],
     );
   }
 }

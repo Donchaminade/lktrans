@@ -6,13 +6,14 @@ import 'package:lktrans/features/auth/presentation/screens/login_screen.dart';
 import 'package:lktrans/features/auth/presentation/screens/otp_screen.dart';
 import 'package:lktrans/features/auth/presentation/screens/signup_screen.dart';
 import 'package:lktrans/features/home/presentation/screens/home_screen.dart';
+import 'package:lktrans/features/history/presentation/screens/statistics_screen.dart';
 import 'package:lktrans/features/routes/presentation/screens/route_catalog_screen.dart';
 import 'package:lktrans/features/routes/presentation/screens/route_detail_screen.dart';
 import 'package:lktrans/features/splash/presentation/screens/splash_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/confirmation_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/payment_screen.dart';
+import 'package:lktrans/features/tickets/presentation/screens/reservation_entry_point_screen.dart'; // Import ReservationEntryPointScreen
 import 'package:lktrans/features/tickets/presentation/screens/reservation_screen.dart';
-import 'package:lktrans/features/history/presentation/screens/statistics_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/ticket_detail_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/tickets_screen.dart'; // Import TicketsScreen
 
@@ -101,11 +102,21 @@ final GoRouter appRouter = GoRouter(
       ),
     ),
     GoRoute(
+      path: '/reservation-entry', // New route for reservation entry point
+      pageBuilder: (context, state) => _buildPageWithFadeTransition(
+        context: context,
+        state: state,
+        child: const ReservationEntryPointScreen(),
+      ),
+    ),
+    GoRoute(
       path: '/reservation',
       pageBuilder: (context, state) => _buildPageWithFadeTransition(
         context: context,
         state: state,
-        child: const ReservationScreen(),
+        child: ReservationScreen(
+          routeData: state.extra as Map<String, dynamic>?, // Optional route data
+        ),
       ),
     ),
     GoRoute(

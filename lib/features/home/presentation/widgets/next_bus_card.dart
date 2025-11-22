@@ -74,12 +74,11 @@ class NextBusCard extends StatelessWidget {
                 alignment: Alignment.bottomRight,
                 child: OutlinedButton(
                   onPressed: onDetailsPressed,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.white),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                  ),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      side: const BorderSide(color: Colors.white),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), // Consistent rounded corners
+                                    ),
                   child: const Text('Voir ➕'),
                 ),
               ),

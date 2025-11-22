@@ -82,12 +82,12 @@ class RouteDetailScreen extends StatelessWidget {
                         ?.copyWith(color: AppColors.textPrimary),
                   ),
                   const SizedBox(height: 48), // Spacing before the button
-                  LoadingButton(
-                    onPressed: () async {
-                      context.push('/reservation');
-                    },
-                    text: ' Réserver ',
-                  ),
+            LoadingButton(
+              onPressed: () async {
+                context.push('/reservation', extra: routeDetails);
+              },
+              text: 'Réserver ce Trajet',
+            ),
                 ],
               ),
             ),

@@ -20,53 +20,71 @@ class RouteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Card(
-      elevation: 5, // Slightly more pronounced elevation
-      shadowColor: Colors.black.withOpacity(0.15),
+    return Container( // Use Container for the main card structure to control border directly
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // More rounded corners
-      child: InkWell(
-        onTap: onTap,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              colors: [Colors.white, AppColors.background.withOpacity(0.5)], // Subtle gradient
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
-          padding: const EdgeInsets.all(20.0),
+        ],
+      ),
+      child: Material( // Use Material to enable InkWell splash effect
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Départ', style: textTheme.bodySmall?.copyWith(color: AppColors.textSecondary)),
-                  Text('Arrivée', style: textTheme.bodySmall?.copyWith(color: AppColors.textSecondary)),
-                ],
-              ),
-              const SizedBox(height: 8), // Increased spacing
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(child: Text(from, style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary))),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Icon(Icons.arrow_right_alt_rounded, color: AppColors.primary, size: 32), // Larger icon
+              // Top vert air border/indicator
+              Container(
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: AppColors.greenAir, // Top border color
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
                   ),
-                  Expanded(child: Text(to, textAlign: TextAlign.right, style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary))),
-                ],
+                ),
               ),
-              const Divider(height: 32, thickness: 1), // Thicker divider
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildInfoChip(context, Icons.monetization_on_outlined, price),
-                  _buildInfoChip(context, Icons.map_outlined, km),
-                ],
+              Padding(
+                padding: const EdgeInsets.all(20.0), // Reverted padding to 20 for better look in card
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Départ', style: textTheme.bodySmall?.copyWith(color: AppColors.textSecondary)),
+                        Text('Arrivée', style: textTheme.bodySmall?.copyWith(color: AppColors.textSecondary)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(child: Text(from, style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary))),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Icon(Icons.arrow_right_alt_rounded, color: AppColors.primary, size: 32),
+                        ),
+                        Expanded(child: Text(to, textAlign: TextAlign.right, style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary))), 
+                      ],
+                    ),
+                    const Divider(height: 32, thickness: 1),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildInfoChip(context, Icons.monetization_on_outlined, price, color: AppColors.orangeLight), // Price in orange
+                        _buildInfoChip(context, Icons.map_outlined, km),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -75,12 +93,12 @@ class RouteCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoChip(BuildContext context, IconData icon, String label) {
+  Widget _buildInfoChip(BuildContext context, IconData icon, String label, {Color? color}) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.primary, size: 20), // Slightly larger icon
-        const SizedBox(width: 10), // Increased spacing
-        Text(label, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)), // Use bodyLarge
+        Icon(icon, color: color ?? AppColors.primary, size: 20),
+        const SizedBox(width: 10),
+        Text(label, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: color ?? AppColors.textPrimary)),
       ],
     );
   }
