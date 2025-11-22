@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lktrans/core/constants/app_colors.dart';
 import 'package:lktrans/features/home/presentation/widgets/next_bus_card.dart';
 import 'package:lktrans/features/home/presentation/widgets/promo_carousel.dart';
+import 'package:lktrans/features/home/presentation/widgets/route_highlights.dart';
 import 'package:lktrans/features/home/presentation/widgets/upcoming_bus_list.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -99,6 +100,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? const UpcomingBusList()
                     : const SizedBox.shrink(),
               ),
+              const SizedBox(height: 24),
+              const RouteHighlights(),
               const SizedBox(height: 24),
               const PromoCarousel(),
             ],

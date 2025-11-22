@@ -16,7 +16,7 @@ class _MainShellState extends State<MainShell> {
     if (location.startsWith('/home')) {
       return 0;
     }
-    if (location.startsWith('/routes')) {
+    if (location.startsWith('/tickets')) { // Changed from /routes to /tickets
       return 1;
     }
     if (location.startsWith('/history')) {
@@ -34,7 +34,7 @@ class _MainShellState extends State<MainShell> {
         context.go('/home');
         break;
       case 1:
-        context.go('/routes');
+        context.go('/tickets'); // Changed from /routes to /tickets
         break;
       // Add other cases for other tabs later
       // case 2:
@@ -63,9 +63,9 @@ class _MainShellState extends State<MainShell> {
             label: 'Accueil',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.explore_outlined),
-            activeIcon: Icon(Icons.explore),
-            label: 'Trajets',
+            icon: Icon(Icons.airplane_ticket_outlined), // Changed icon
+            activeIcon: Icon(Icons.airplane_ticket), // Changed icon
+            label: 'Tickets', // Changed label
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history_outlined),

@@ -9,6 +9,11 @@ import 'package:lktrans/features/home/presentation/screens/home_screen.dart';
 import 'package:lktrans/features/routes/presentation/screens/route_catalog_screen.dart';
 import 'package:lktrans/features/routes/presentation/screens/route_detail_screen.dart';
 import 'package:lktrans/features/splash/presentation/screens/splash_screen.dart';
+import 'package:lktrans/features/tickets/presentation/screens/confirmation_screen.dart';
+import 'package:lktrans/features/tickets/presentation/screens/payment_screen.dart';
+import 'package:lktrans/features/tickets/presentation/screens/reservation_screen.dart';
+import 'package:lktrans/features/tickets/presentation/screens/ticket_detail_screen.dart'; // Import TicketDetailScreen
+import 'package:lktrans/features/tickets/presentation/screens/tickets_screen.dart'; // Import TicketsScreen
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -63,17 +68,55 @@ final GoRouter appRouter = GoRouter(
           path: '/routes',
           builder: (BuildContext context, GoRouterState state) => const RouteCatalogScreen(),
         ),
+        GoRoute(
+          path: '/tickets', // Nouvelle route pour les tickets
+          builder: (BuildContext context, GoRouterState state) => const TicketsScreen(),
+        ),
         // Ajouter d'autres routes principales ici (ex: /history, /profile)
       ],
     ),
     GoRoute(
-      path: '/route-details',
+      path: '/route-details', // Modified to not use path parameter
       pageBuilder: (context, state) => _buildPageWithFadeTransition(
         context: context,
         state: state,
         child: RouteDetailScreen(
           routeId: state.extra! as String, // Extraira l'ID de 'extra'
         ),
+      ),
+    ),
+    GoRoute(
+      path: '/ticket-details', // New route for TicketDetailScreen
+      pageBuilder: (context, state) => _buildPageWithFadeTransition(
+        context: context,
+        state: state,
+        child: TicketDetailScreen(
+          ticketData: state.extra! as Map<String, dynamic>, // Pass the entire ticket object
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/reservation',
+      pageBuilder: (context, state) => _buildPageWithFadeTransition(
+        context: context,
+        state: state,
+        child: const ReservationScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/payment',
+      pageBuilder: (context, state) => _buildPageWithFadeTransition(
+        context: context,
+        state: state,
+        child: const PaymentScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/confirmation',
+      pageBuilder: (context, state) => _buildPageWithFadeTransition(
+        context: context,
+        state: state,
+        child: const ConfirmationScreen(),
       ),
     ),
   ],
