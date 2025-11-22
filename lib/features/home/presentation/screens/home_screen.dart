@@ -1,0 +1,110 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:lktrans/core/constants/app_colors.dart';
+import 'package:lktrans/features/home/presentation/widgets/next_bus_card.dart';
+import 'package:lktrans/features/home/presentation/widgets/promo_carousel.dart';
+import 'package:lktrans/features/home/presentation/widgets/upcoming_bus_list.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late Timer _timer;
+  Duration _timeRemaining = const Duration(hours: 1, minutes: 23, seconds: 45);
+  bool _isBusListVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted && _timeRemaining.inSeconds > 0) {
+        setState(() {
+          _timeRemaining = _timeRemaining - const Duration(seconds: 1);
+        });
+      } else {
+        _timer.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Bonjour, Chami', // Placeholder name
+          style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary, size: 28),
+          ),
+          const SizedBox(width: 8),
+          const Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: CircleAvatar(
+              radius: 20,
+              backgroundImage: AssetImage('assets/images/bus_sample.jpg'), // Placeholder image
+            ),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              NextBusCard(
+                timeRemaining: _timeRemaining,
+                onDetailsPressed: () {
+                  setState(() {
+                    _isBusListVisible = !_isBusListVisible;
+                  });
+                },
+              ),
+              const SizedBox(height: 24),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SizeTransition(
+                      sizeFactor: animation,
+                      axis: Axis.vertical,
+                      child: child,
+                    ),
+                  );
+                },
+                child: _isBusListVisible
+                    ? const UpcomingBusList()
+                    : const SizedBox.shrink(),
+              ),
+              const SizedBox(height: 24),
+              const PromoCarousel(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
