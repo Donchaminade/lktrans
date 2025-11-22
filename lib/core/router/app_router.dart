@@ -12,7 +12,8 @@ import 'package:lktrans/features/splash/presentation/screens/splash_screen.dart'
 import 'package:lktrans/features/tickets/presentation/screens/confirmation_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/payment_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/reservation_screen.dart';
-import 'package:lktrans/features/tickets/presentation/screens/ticket_detail_screen.dart'; // Import TicketDetailScreen
+import 'package:lktrans/features/history/presentation/screens/statistics_screen.dart';
+import 'package:lktrans/features/tickets/presentation/screens/ticket_detail_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/tickets_screen.dart'; // Import TicketsScreen
 
 final GoRouter appRouter = GoRouter(
@@ -72,7 +73,11 @@ final GoRouter appRouter = GoRouter(
           path: '/tickets', // Nouvelle route pour les tickets
           builder: (BuildContext context, GoRouterState state) => const TicketsScreen(),
         ),
-        // Ajouter d'autres routes principales ici (ex: /history, /profile)
+        GoRoute(
+          path: '/history', // Route pour les statistiques
+          builder: (BuildContext context, GoRouterState state) => const StatisticsScreen(),
+        ),
+        // Ajouter d'autres routes principales ici (ex: /profile)
       ],
     ),
     GoRoute(

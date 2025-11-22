@@ -16,7 +16,7 @@ class _MainShellState extends State<MainShell> {
     if (location.startsWith('/home')) {
       return 0;
     }
-    if (location.startsWith('/tickets')) { // Changed from /routes to /tickets
+    if (location.startsWith('/tickets')) {
       return 1;
     }
     if (location.startsWith('/history')) {
@@ -36,13 +36,12 @@ class _MainShellState extends State<MainShell> {
       case 1:
         context.go('/tickets'); // Changed from /routes to /tickets
         break;
-      // Add other cases for other tabs later
-      // case 2:
-      //   context.go('/history');
-      //   break;
+      case 2:
+        context.go('/history'); // Navigate to history/statistics
+        break;
       // case 3:
       //   context.go('/profile');
-      //   break;
+      //   break;;
     }
   }
 
