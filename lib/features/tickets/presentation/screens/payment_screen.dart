@@ -44,7 +44,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 children: [
                   Text(
                     'Montant à payer: 3500 FCFA', // Placeholder amount
-                    style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary),
+                    style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 10, 3)),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),

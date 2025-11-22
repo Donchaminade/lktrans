@@ -436,7 +436,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                   }
                 }
               },
-              text: _currentPage < (_totalSteps - 1) ? 'Suivant' : 'Procéder au Paiement',
+              text: _currentPage < (_totalSteps - 1) ? 'Suivant' : 'Finaliser',
             ),
           ),
         ],

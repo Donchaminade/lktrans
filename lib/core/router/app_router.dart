@@ -12,10 +12,9 @@ import 'package:lktrans/features/routes/presentation/screens/route_detail_screen
 import 'package:lktrans/features/splash/presentation/screens/splash_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/confirmation_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/payment_screen.dart';
-import 'package:lktrans/features/tickets/presentation/screens/reservation_entry_point_screen.dart'; // Import ReservationEntryPointScreen
 import 'package:lktrans/features/tickets/presentation/screens/reservation_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/ticket_detail_screen.dart';
-import 'package:lktrans/features/tickets/presentation/screens/tickets_screen.dart'; // Import TicketsScreen
+import 'package:lktrans/features/tickets/presentation/screens/tickets_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -71,7 +70,7 @@ final GoRouter appRouter = GoRouter(
           builder: (BuildContext context, GoRouterState state) => const RouteCatalogScreen(),
         ),
         GoRoute(
-          path: '/tickets', // Nouvelle route pour les tickets
+          path: '/tickets',
           builder: (BuildContext context, GoRouterState state) => const TicketsScreen(),
         ),
         GoRoute(
@@ -82,31 +81,23 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
     GoRoute(
-      path: '/route-details', // Modified to not use path parameter
+      path: '/route-details',
       pageBuilder: (context, state) => _buildPageWithFadeTransition(
         context: context,
         state: state,
         child: RouteDetailScreen(
-          routeId: state.extra! as String, // Extraira l'ID de 'extra'
+          routeId: state.extra! as String,
         ),
       ),
     ),
     GoRoute(
-      path: '/ticket-details', // New route for TicketDetailScreen
+      path: '/ticket-details',
       pageBuilder: (context, state) => _buildPageWithFadeTransition(
         context: context,
         state: state,
         child: TicketDetailScreen(
-          ticketData: state.extra! as Map<String, dynamic>, // Pass the entire ticket object
+          ticketData: state.extra! as Map<String, dynamic>,
         ),
-      ),
-    ),
-    GoRoute(
-      path: '/reservation-entry', // New route for reservation entry point
-      pageBuilder: (context, state) => _buildPageWithFadeTransition(
-        context: context,
-        state: state,
-        child: const ReservationEntryPointScreen(),
       ),
     ),
     GoRoute(

@@ -166,15 +166,15 @@ class _TicketsScreenState extends State<TicketsScreen> {
                           },
                         ),
                 ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.all(16.0),
-                                                    child: LoadingButton(
-                                                      onPressed: () async {
-                                                        context.push('/reservation-entry'); // Navigates to ReservationEntryPointScreen
-                                                      },
-                                                      text: 'Faire une réservation',
-                                                    ),
-                                                  ),              ],
+                                                                    Padding(
+                                                                      padding: const EdgeInsets.all(16.0),
+                                                                      child: LoadingButton(
+                                                                        onPressed: () async {
+                                                                          context.push('/reservation'); // Navigates directly to ReservationScreen
+                                                                        },
+                                                                        text: 'Faire une réservation',
+                                                                      ),
+                                                                    ),              ],
             ),
           ),
         ],
