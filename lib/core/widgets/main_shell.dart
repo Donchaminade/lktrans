@@ -19,10 +19,10 @@ class _MainShellState extends State<MainShell> {
     if (location.startsWith('/tickets')) {
       return 1;
     }
-    if (location.startsWith('/history')) {
+    if (location.startsWith('/routes')) {
       return 2;
     }
-    if (location.startsWith('/profile')) {
+    if (location.startsWith('/history')) {
       return 3;
     }
     return 0;
@@ -34,14 +34,14 @@ class _MainShellState extends State<MainShell> {
         context.go('/home');
         break;
       case 1:
-        context.go('/tickets'); // Changed from /routes to /tickets
+        context.go('/tickets');
         break;
       case 2:
-        context.go('/history'); // Navigate to history/statistics
+        context.go('/routes');
         break;
-      // case 3:
-      //   context.go('/profile');
-      //   break;;
+      case 3:
+        context.go('/history');
+        break;
     }
   }
 
@@ -62,19 +62,19 @@ class _MainShellState extends State<MainShell> {
             label: 'Accueil',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.airplane_ticket_outlined), // Changed icon
-            activeIcon: Icon(Icons.airplane_ticket), // Changed icon
-            label: 'Tickets', // Changed label
+            icon: Icon(Icons.airplane_ticket_outlined),
+            activeIcon: Icon(Icons.airplane_ticket),
+            label: 'Tickets',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map_outlined),
+            activeIcon: Icon(Icons.map),
+            label: 'Routes',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history_outlined),
             activeIcon: Icon(Icons.history),
             label: 'Historique',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profil',
           ),
         ],
       ),

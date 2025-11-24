@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     context,
                     icon: Icons.confirmation_num_outlined,
                     label: 'Réserver',
-                    onTap: () => context.push('/reservation-entry'),
+                    onTap: () => context.push('/reservation'),
                   ),
                   _buildQuickActionButton(
                     context,

@@ -58,7 +58,7 @@ final GoRouter appRouter = GoRouter(
     // ShellRoute pour la navigation principale avec BottomNavBar
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        return MainShell(child: child);
+        return MainShell(key: state.pageKey, child: child);
       },
       routes: <RouteBase>[
         GoRoute(

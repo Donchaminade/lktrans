@@ -2,89 +2,81 @@ import 'package:flutter/material.dart';
 import 'package:lktrans/core/constants/app_colors.dart';
 
 class NextBusCard extends StatelessWidget {
-  final VoidCallback onDetailsPressed;
   final Duration timeRemaining;
+  final VoidCallback onDetailsPressed;
 
   const NextBusCard({
     super.key,
-    required this.onDetailsPressed,
     required this.timeRemaining,
+    required this.onDetailsPressed,
   });
-
-  String _formatDuration(Duration d) {
-    // Format to HH:MM:SS
-    return d.toString().split('.').first.padLeft(8, "0");
-  }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Card(
-      elevation: 8,
-      shadowColor: Colors.black.withOpacity(0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [AppColors.primary, AppColors.accent],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(25.0),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'PROCHAIN DÉPART',
-                style: textTheme.bodyMedium
-                    ?.copyWith(color: Colors.white.withOpacity(0.8)),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'BUS 12 - ${_formatDuration(timeRemaining)}',
-                style: textTheme.headlineMedium?.copyWith(
-                    color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Icon(Icons.person_pin_circle_outlined,
-                      color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
-                  Text('Chauffeur: John Doe',
-                      style:
-                          textTheme.bodyLarge?.copyWith(color: Colors.white)),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Icon(Icons.numbers, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
-                  Text('Plaque: AB-123-CD',
-                      style:
-                          textTheme.bodyLarge?.copyWith(color: Colors.white)),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: OutlinedButton(
-                  onPressed: onDetailsPressed,
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      side: const BorderSide(color: Colors.white),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), // Consistent rounded corners
-                                    ),
-                  child: const Text('Voir ➕'),
+                'Prochain départ',
+                style: textTheme.titleMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              const Icon(
+                Icons.directions_bus,
+                color: Colors.white,
+                size: 28,
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 12),
+          Text(
+            '${timeRemaining.inHours.toString().padLeft(2, '0')}:${(timeRemaining.inMinutes % 60).toString().padLeft(2, '0')}:${(timeRemaining.inSeconds % 60).toString().padLeft(2, '0')}',
+            style: textTheme.headlineLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Destination: Douala - Terminus 2', // Placeholder
+            style: textTheme.bodyLarge?.copyWith(color: Colors.white70),
+          ),
+          const SizedBox(height: 20),
+          Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton(
+              onPressed: onDetailsPressed,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: const BorderSide(color: Colors.white54),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: const Text('Plus de détails'),
+            ),
+          ),
+        ],
       ),
     );
   }
