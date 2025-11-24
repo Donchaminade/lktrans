@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lktrans/core/constants/app_colors.dart';
+import 'package:lktrans/features/home/presentation/widgets/home_banner.dart'; // Import du nouveau widget
 import 'package:lktrans/features/home/presentation/widgets/next_bus_card.dart';
 import 'package:lktrans/features/home/presentation/widgets/promo_carousel.dart';
 import 'package:lktrans/features/home/presentation/widgets/route_highlights.dart';
@@ -18,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Timer _timer;
   Duration _timeRemaining = const Duration(hours: 1, minutes: 23, seconds: 45);
   bool _isBusListVisible = false;
+  bool _showInfoBanner = true; // Nouvel état pour la visibilité de la bannière
 
   @override
   void initState() {
@@ -76,6 +78,17 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (_showInfoBanner) // Afficher la bannière si _showInfoBanner est true
+                HomeBanner(
+                  message: 'Découvrez nos nouvelles offres spéciales !', // Message simplifié
+                  type: HomeBannerType.normal, // Type mis à jour
+                  onDismissed: () {
+                    setState(() {
+                      _showInfoBanner = false;
+                    });
+                  },
+                ),
+              const SizedBox(height: 16), // Espacement après la bannière
               NextBusCard(
                 timeRemaining: _timeRemaining,
                 onDetailsPressed: () {
