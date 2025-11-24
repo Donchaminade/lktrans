@@ -5,6 +5,8 @@ import 'package:lktrans/core/constants/app_colors.dart';
 import 'package:lktrans/core/widgets/loading_button.dart';
 import 'package:lktrans/features/tickets/presentation/widgets/ticket_card.dart'; // For TicketStatus enum
 
+import 'package:qr_flutter/qr_flutter.dart';
+
 class TicketDetailScreen extends StatelessWidget {
   final Map<String, dynamic> ticketData;
 
@@ -14,15 +16,7 @@ class TicketDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    Color statusColor = AppColors.primary;
-    String statusText = 'À venir';
-    if (ticketData['status'] == TicketStatus.past) {
-      statusColor = Colors.grey;
-      statusText = 'Terminé';
-    } else if (ticketData['status'] == TicketStatus.cancelled) {
-      statusColor = AppColors.error;
-      statusText = 'Annulé';
-    }
+    final status = ticketData['status'] as TicketStatus;
 
     return Scaffold(
       appBar: AppBar(
@@ -63,8 +57,8 @@ class TicketDetailScreen extends StatelessWidget {
                         children: [
                           Text('Ticket de Bus', style: textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
                           Chip(
-                            label: Text(statusText, style: textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
-                            backgroundColor: statusColor,
+                            label: Text(status.displayName, style: textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                            backgroundColor: status.color,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                         ],
@@ -102,12 +96,15 @@ class TicketDetailScreen extends StatelessWidget {
                         children: [
                           Text('Présentez ce code à l\'embarquement', style: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
                           const SizedBox(height: 16),
-                          // Placeholder for QR code or barcode image
-                          Container(
-                            height: 100,
-                            width: 200,
-                            color: Colors.grey.shade200,
-                            child: const Center(child: Text('QR Code/Barcode')),
+                          QrImageView(
+                            data: ticketData['reservationCode'] ?? 'No data',
+                            version: QrVersions.auto,
+                            size: 120.0,
+                            gapless: false,
+                            embeddedImage: const AssetImage('assets/images/logo_lk.png'),
+                            embeddedImageStyle: const QrEmbeddedImageStyle(
+                              size: Size(30, 30),
+                            ),
                           ),
                           const SizedBox(height: 16),
                           Text('Code de réservation: ${ticketData['reservationCode'] ?? 'ABCDE12345'}', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),

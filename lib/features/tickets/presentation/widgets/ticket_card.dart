@@ -4,6 +4,30 @@ import 'package:lktrans/core/constants/app_colors.dart';
 
 enum TicketStatus { upcoming, past, cancelled }
 
+extension TicketStatusX on TicketStatus {
+  Color get color {
+    switch (this) {
+      case TicketStatus.upcoming:
+        return AppColors.accent;
+      case TicketStatus.past:
+        return Colors.grey;
+      case TicketStatus.cancelled:
+        return Colors.red;
+    }
+  }
+
+  String get displayName {
+    switch (this) {
+      case TicketStatus.upcoming:
+        return 'À venir';
+      case TicketStatus.past:
+        return 'Terminé';
+      case TicketStatus.cancelled:
+        return 'Annulé';
+    }
+  }
+}
+
 class TicketCard extends StatelessWidget {
   final String from;
   final String to;
@@ -23,28 +47,6 @@ class TicketCard extends StatelessWidget {
     required this.passengerName,
     required this.onTap,
   });
-
-  Color _getStatusColor(TicketStatus status) {
-    switch (status) {
-      case TicketStatus.upcoming:
-        return AppColors.accent;
-      case TicketStatus.past:
-        return Colors.grey;
-      case TicketStatus.cancelled:
-        return Colors.red;
-    }
-  }
-
-  String _getStatusText(TicketStatus status) {
-    switch (status) {
-      case TicketStatus.upcoming:
-        return 'À venir';
-      case TicketStatus.past:
-        return 'Terminé';
-      case TicketStatus.cancelled:
-        return 'Annulé';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,12 +114,12 @@ class TicketCard extends StatelessWidget {
              Container(
               padding: const EdgeInsets.symmetric(vertical: 8),
               width: double.infinity,
-              color: _getStatusColor(status).withOpacity(0.15),
+              color: status.color.withOpacity(0.15),
               child: Text(
-                _getStatusText(status).toUpperCase(),
+                status.displayName.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: textTheme.bodyMedium?.copyWith(
-                  color: _getStatusColor(status),
+                  color: status.color,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                 ),

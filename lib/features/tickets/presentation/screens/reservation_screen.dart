@@ -78,10 +78,20 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
   void _nextPage() {
     bool isValid = false;
-    if (_needsManualRouteEntry && _currentPage == 0) {
-      isValid = _formKeyStep1Manual.currentState?.validate() ?? false;
-    } else if ((_needsManualRouteEntry && _currentPage == 1) || (!_needsManualRouteEntry && _currentPage == 0)) {
-      isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
+    if (_needsManualRouteEntry) {
+      if (_currentPage == 0) {
+        isValid = _formKeyStep1Manual.currentState?.validate() ?? false;
+      } else if (_currentPage == 1) {
+        isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
+      } else if (_currentPage == 2) {
+        isValid = _formKeyStep3DateBaggage.currentState?.validate() ?? false;
+      }
+    } else { // Does not need manual route entry
+      if (_currentPage == 0) {
+        isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
+      } else if (_currentPage == 1) {
+        isValid = _formKeyStep3DateBaggage.currentState?.validate() ?? false;
+      }
     }
 
     if (isValid) {
@@ -176,22 +186,18 @@ class _ReservationScreenState extends State<ReservationScreen> {
                         _currentPage = page;
                       });
                     },
-                    children: _needsManualRouteEntry
-                        ? [
-                            _buildStep1ManualRoute(textTheme),
-                            _buildStep2Passengers(textTheme),
-                            _buildStep3DateBaggage(textTheme),
-                          ]
-                        : [
-                            _buildStep1Passengers(textTheme), // Original passenger step
-                            _buildStep2DateBaggage(textTheme), // Original date/baggage step
-                          ],
+                    children: [
+                      if (_needsManualRouteEntry) _buildStep1ManualRoute(textTheme),
+                      _buildPassengerDetailsForm(textTheme),
+                      _buildDateBaggageForm(textTheme),
+                    ],
                   ),
                 ),
                 _buildNavigationButtons(),
               ],
             ),
           ),
+
         ],
       ),
     );
@@ -227,15 +233,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
     );
   }
 
-  Widget _buildStep1Passengers(TextTheme textTheme) {
-    // This is the first step if routeData is pre-filled
-    return _buildPassengerDetailsForm(textTheme);
-  }
-
-  Widget _buildStep2Passengers(TextTheme textTheme) {
-    // This is the second step if manual route entry is first
-    return _buildPassengerDetailsForm(textTheme);
-  }
 
   Widget _buildPassengerDetailsForm(TextTheme textTheme) {
     return SingleChildScrollView(
@@ -309,15 +306,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
     );
   }
 
-  Widget _buildStep2DateBaggage(TextTheme textTheme) {
-    // This is the second step if routeData is pre-filled
-    return _buildDateBaggageForm(textTheme);
-  }
-
-  Widget _buildStep3DateBaggage(TextTheme textTheme) {
-    // This is the third step if manual route entry is first
-    return _buildDateBaggageForm(textTheme);
-  }
 
   Widget _buildDateBaggageForm(TextTheme textTheme) {
     return SingleChildScrollView(
@@ -416,23 +404,31 @@ class _ReservationScreenState extends State<ReservationScreen> {
             child: LoadingButton(
               onPressed: () async {
                 bool isValid = false;
-                if (_needsManualRouteEntry && _currentPage == 0) {
-                  isValid = _formKeyStep1Manual.currentState?.validate() ?? false;
-                } else if ((_needsManualRouteEntry && _currentPage == 1) || (!_needsManualRouteEntry && _currentPage == 0)) {
-                  isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
-                } else if ((_needsManualRouteEntry && _currentPage == 2) || (!_needsManualRouteEntry && _currentPage == 1)) {
-                  isValid = _formKeyStep3DateBaggage.currentState?.validate() ?? false;
+                if (_needsManualRouteEntry) {
+                  if (_currentPage == 0) {
+                    isValid = _formKeyStep1Manual.currentState?.validate() ?? false;
+                  } else if (_currentPage == 1) {
+                    isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
+                  } else if (_currentPage == 2) {
+                    isValid = _formKeyStep3DateBaggage.currentState?.validate() ?? false;
+                  }
+                } else { // Does not need manual route entry
+                  if (_currentPage == 0) {
+                    isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
+                  } else if (_currentPage == 1) {
+                    isValid = _formKeyStep3DateBaggage.currentState?.validate() ?? false;
+                  }
                 }
 
                 if (isValid) {
                   if (_currentPage < (_totalSteps - 1)) {
-                    _nextPage();
+                    _pageController.nextPage(
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                    );
                   } else {
-                    // Last step: Validate and submit
-                    // Final validation for the last step
-                    if (_formKeyStep3DateBaggage.currentState?.validate() ?? false) {
-                       context.push('/payment');
-                    }
+                    // Last step: Navigate to payment
+                    context.push('/payment');
                   }
                 }
               },
