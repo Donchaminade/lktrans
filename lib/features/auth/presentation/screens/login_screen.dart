@@ -15,14 +15,14 @@ class LoginScreen extends StatelessWidget {
         children: [
           const GeometricBackground(),
           SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+            child: Padding( // Appliquer le padding directement au Column
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20), // Réduit
                   Image.asset('assets/images/logo_lk.png', height: 150),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 20), // Réduit
                   Text(
                     'Bienvenue',
                     textAlign: TextAlign.center,
@@ -34,7 +34,7 @@ class LoginScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: textTheme.bodyLarge,
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20), // Réduit
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Email ou N° de téléphone',
@@ -59,7 +59,7 @@ class LoginScreen extends StatelessWidget {
                       child: const Text('Mot de passe oublié ?'),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16), // Réduit
                                 LoadingButton(
                                   onPressed: () async {
                                     // TODO: Implement actual login logic
@@ -67,7 +67,7 @@ class LoginScreen extends StatelessWidget {
                                     context.go('/home');
                                   },
                                   text: 'Connexion',
-                                ),                  const SizedBox(height: 40),
+                                ),                  const SizedBox(height: 16), // Réduit
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

@@ -72,32 +72,7 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Center(
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.grey.shade200,
-                    backgroundImage: _isProfilePicSelected ? const AssetImage('assets/images/bus_sample.jpg') : null,
-                    child: !_isProfilePicSelected
-                        ? Icon(Icons.person, size: 70, color: Colors.grey.shade400)
-                        : null,
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: InkWell(
-                      onTap: () => setState(() => _isProfilePicSelected = true),
-                      child: CircleAvatar(
-                        radius: 18,
-                        backgroundColor: AppColors.primary,
-                        child: const Icon(Icons.add_a_photo, color: Colors.white, size: 23),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+            Image.asset('assets/images/logo_lk.png', height: 150), // Ajout du logo
             const SizedBox(height: 30),
             TextFormField(
               decoration: const InputDecoration(labelText: 'Nom et prénoms', prefixIcon: Icon(Icons.person_outline)),
