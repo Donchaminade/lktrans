@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lktrans/core/constants/app_colors.dart';
 import 'package:lktrans/core/widgets/geometric_background.dart';
 import 'package:lktrans/core/widgets/loading_button.dart';
+import 'package:lktrans/features/routes/data/route_data.dart'; // Import pour la liste des villes
 
 class ReservationScreen extends StatefulWidget {
   final Map<String, dynamic>? routeData; // Optional route data
@@ -32,11 +33,14 @@ class _ReservationScreenState extends State<ReservationScreen> {
   final TextEditingController _otherPassengerPhoneController = TextEditingController();
   final TextEditingController _otherPassengerEmailController = TextEditingController();
 
-  // Controllers for Manual Route Form fields
-  final TextEditingController _departureCityController = TextEditingController();
-  final TextEditingController _destinationCityController = TextEditingController();
+  // Variables d'état pour les villes (remplacent les TextEditingController)
+  String? _selectedDepartureCity;
+  String? _selectedDestinationCity;
+  String? _selectedNumberOfPassengers; // Ajouté pour le nombre de passagers
+
+  // Controllers existants
   final TextEditingController _departureDateController = TextEditingController();
-  final TextEditingController _numberOfSeatsController = TextEditingController();
+  final TextEditingController _numberOfSeatsController = TextEditingController(); // Ceci sera le nombre de passagers
 
   // Baggage Photo Simulation
   final List<String> _baggagePhotos = []; // Store placeholder image paths
@@ -46,14 +50,13 @@ class _ReservationScreenState extends State<ReservationScreen> {
   void initState() {
     super.initState();
     if (widget.routeData != null) {
-      // If routeData is provided, skip manual route entry step
-      // and pre-fill if applicable, or just adjust initial page logic
-      // For now, assume if routeData is present, we start at passenger info
-      // _currentPage = 0; // This will be the passenger step if manual route entry is first
+      _selectedDepartureCity = widget.routeData!['from'];
+      _selectedDestinationCity = widget.routeData!['to'];
     }
     // Mock data for initial date
     _departureDateController.text = '25 déc. 2025';
     _numberOfSeatsController.text = '1';
+    _selectedNumberOfPassengers = '1'; // Initialisation
   }
 
   @override
@@ -64,8 +67,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
     _otherPassengerNameController.dispose();
     _otherPassengerPhoneController.dispose();
     _otherPassengerEmailController.dispose();
-    _departureCityController.dispose();
-    _destinationCityController.dispose();
+    // _departureCityController.dispose(); // Plus nécessaire
+    // _destinationCityController.dispose(); // Plus nécessaire
     _departureDateController.dispose();
     _numberOfSeatsController.dispose();
     super.dispose();
@@ -169,7 +172,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Réservation - Étape ${_currentPage + 1} sur $_totalSteps'),
+        title: const Text('Réservation'), // Titre simplifié
       ),
       body: Stack(
         children: [
@@ -177,6 +180,11 @@ class _ReservationScreenState extends State<ReservationScreen> {
           SafeArea(
             child: Column(
               children: [
+                LinearProgressIndicator(
+                  value: (_currentPage + 1) / _totalSteps, // Calcul de la progression
+                  backgroundColor: AppColors.primary.withOpacity(0.2),
+                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                ),
                 Expanded(
                   child: PageView(
                     controller: _pageController,
@@ -214,18 +222,86 @@ class _ReservationScreenState extends State<ReservationScreen> {
           children: [
             Text('Trajet de Voyage', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text('Entrez les détails de votre trajet.', style: textTheme.bodyLarge),
+            Text('Sélectionnez votre ville de départ et de destination.', style: textTheme.bodyLarge),
             const SizedBox(height: 24),
-            TextFormField(
-              controller: _departureCityController,
-              decoration: const InputDecoration(labelText: 'Ville de Départ', prefixIcon: Icon(Icons.location_on_outlined)),
-              validator: (value) => (value?.isEmpty ?? true) ? 'Ce champ est requis' : null,
+            DropdownButtonFormField<String>(
+              value: _selectedDepartureCity,
+              decoration: const InputDecoration(
+                labelText: 'Ville de Départ',
+                prefixIcon: Icon(Icons.location_on_outlined),
+              ),
+              items: cities.map((String city) {
+                return DropdownMenuItem<String>(
+                  value: city,
+                  child: Text(city),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedDepartureCity = newValue;
+                });
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Veuillez sélectionner une ville de départ';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _destinationCityController,
-              decoration: const InputDecoration(labelText: 'Ville de Destination', prefixIcon: Icon(Icons.location_on)),
-              validator: (value) => (value?.isEmpty ?? true) ? 'Ce champ est requis' : null,
+            DropdownButtonFormField<String>(
+              value: _selectedDestinationCity,
+              decoration: const InputDecoration(
+                labelText: 'Ville de Destination',
+                prefixIcon: Icon(Icons.location_on),
+              ),
+              items: cities.map((String city) {
+                return DropdownMenuItem<String>(
+                  value: city,
+                  child: Text(city),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedDestinationCity = newValue;
+                });
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Veuillez sélectionner une ville de destination';
+                }
+                if (value == _selectedDepartureCity) {
+                  return 'La ville de destination ne peut pas être la même que la ville de départ';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 24),
+            Text('Nombre de passagers', style: textTheme.titleMedium),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              value: _selectedNumberOfPassengers,
+              decoration: const InputDecoration(
+                labelText: 'Nombre de personnes',
+                prefixIcon: Icon(Icons.people),
+              ),
+              items: List.generate(5, (index) => (index + 1).toString()).map((String number) {
+                return DropdownMenuItem<String>(
+                  value: number,
+                  child: Text(number),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedNumberOfPassengers = newValue;
+                });
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Veuillez sélectionner le nombre de passagers';
+                }
+                return null;
+              },
             ),
           ],
         ),
