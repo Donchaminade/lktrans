@@ -4,6 +4,8 @@ import 'package:lktrans/core/constants/app_colors.dart';
 import 'package:lktrans/core/widgets/geometric_background.dart';
 import 'package:lktrans/core/widgets/loading_button.dart';
 import 'package:lktrans/features/tickets/presentation/widgets/ticket_card.dart';
+import 'package:lktrans/features/routes/data/route_data.dart'; // Import pour les villes
+import 'dart:math';
 
 class TicketsScreen extends StatefulWidget {
   const TicketsScreen({super.key});
@@ -18,58 +20,42 @@ class _TicketsScreenState extends State<TicketsScreen> {
   final TextEditingController _searchController = TextEditingController();
   TicketFilter _currentFilter = TicketFilter.all;
 
-  final List<Map<String, dynamic>> _allTickets = [
-    {
-      'id': 'T001',
-      'from': 'Abidjan',
-      'to': 'Yamoussoukro',
-      'date': '25 déc. 2025',
-      'time': '14:00',
-      'status': TicketStatus.upcoming,
-      'passengerName': 'Chami Ben',
-      'reservationCode': 'ABCDE12345',
-    },
-    {
-      'id': 'T002',
-      'from': 'Yamoussoukro',
-      'to': 'Bouaké',
-      'date': '01 jan. 2026',
-      'time': '08:30',
-      'status': TicketStatus.upcoming,
-      'passengerName': 'Chami Ben',
-      'reservationCode': 'FGHIJ67890',
-    },
-    {
-      'id': 'T003',
-      'from': 'Abidjan',
-      'to': 'Grand-Bassam',
-      'date': '10 nov. 2025',
-      'time': '10:00',
-      'status': TicketStatus.past,
-      'passengerName': 'Chami Ben',
-      'reservationCode': 'KLMNO11223',
-    },
-    {
-      'id': 'T004',
-      'from': 'Abidjan',
-      'to': 'Daloa',
-      'date': '05 oct. 2025',
-      'time': '18:00',
-      'status': TicketStatus.past,
-      'passengerName': 'Chami Ben',
-      'reservationCode': 'PQRST44556',
-    },
-    {
-      'id': 'T005',
-      'from': 'Korhogo',
-      'to': 'Abidjan',
-      'date': '20 sept. 2025',
-      'time': '22:00',
-      'status': TicketStatus.cancelled,
-      'passengerName': 'Chami Ben',
-      'reservationCode': 'UVWXY77889',
-    },
-  ];
+  final Random _random = Random();
+
+  List<Map<String, dynamic>> _generateMockTickets() {
+    return List.generate(
+      10,
+      (index) {
+        final String fromCity = cities[_random.nextInt(cities.length)];
+        String toCity = cities[_random.nextInt(cities.length)];
+        while (toCity == fromCity) {
+          toCity = cities[_random.nextInt(cities.length)];
+        }
+
+        final statusIndex = _random.nextInt(TicketStatus.values.length);
+        final TicketStatus status = TicketStatus.values[statusIndex];
+
+        return {
+          'id': 'T00${index + 1}',
+          'from': fromCity,
+          'to': toCity,
+          'date': '2${_random.nextInt(5) + 1} déc. 2025', // Dates légèrement variées
+          'time': '${_random.nextInt(12) + 8}:00', // Heures variées
+          'status': status,
+          'passengerName': 'Chami Ben',
+          'reservationCode': 'ABCDE${10000 + index}',
+        };
+      },
+    );
+  }
+
+  late List<Map<String, dynamic>> _allTickets;
+
+  @override
+  void initState() {
+    super.initState();
+    _allTickets = _generateMockTickets();
+  }
 
   List<Map<String, dynamic>> get _filteredTickets {
     return _allTickets.where((ticket) {
@@ -180,15 +166,16 @@ class _TicketsScreenState extends State<TicketsScreen> {
                           },
                         ),
                 ),
-                                                                    Padding(
-                                                                      padding: const EdgeInsets.all(16.0),
-                                                                      child: LoadingButton(
-                                                                        onPressed: () async {
-                                                                          context.push('/reservation'); // Navigates directly to ReservationScreen
-                                                                        },
-                                                                        text: 'Faire une réservation',
-                                                                      ),
-                                                                    ),              ],
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: LoadingButton(
+                    onPressed: () async {
+                      context.push('/reservation'); // Navigates directly to ReservationScreen
+                    },
+                    text: 'Faire une réservation',
+                  ),
+                ),
+              ],
             ),
           ),
         ],

@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward(); // Démarre l'animation
 
-    Timer(const Duration(seconds: 5), () { // Augmente le délai pour voir l'animation
+    Timer(const Duration(seconds: 3), () { // Augmente le délai pour voir l'animation
       if (mounted) {
         context.go('/login');
       }

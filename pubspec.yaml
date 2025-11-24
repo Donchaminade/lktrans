@@ -16,6 +16,9 @@ dependencies:
   shared_preferences: ^2.1.1
   dotted_line: ^3.0.0
   qr_flutter: ^4.1.0
+  pdf: ^3.10.4 # Nouvelle dépendance
+  printing: ^5.12.0 # Nouvelle dépendance
+  path_provider: ^2.1.3 # Nouvelle dépendance
 
 dev_dependencies:
   flutter_test:

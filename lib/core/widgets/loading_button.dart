@@ -64,9 +64,12 @@ class _LoadingButtonState extends State<LoadingButton> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: _handlePress,
-      child: Text(widget.text),
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _handlePress,
+        child: Text(widget.text),
+      ),
     );
   }
 }
