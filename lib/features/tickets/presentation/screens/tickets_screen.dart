@@ -152,16 +152,30 @@ class _TicketsScreenState extends State<TicketsScreen> {
                           itemCount: _filteredTickets.length,
                           itemBuilder: (context, index) {
                             final ticket = _filteredTickets[index];
-                            return TicketCard(
-                              from: ticket['from']!,
-                              to: ticket['to']!,
-                              date: ticket['date']!,
-                              time: ticket['time']!,
-                              status: ticket['status']!,
-                              passengerName: ticket['passengerName']!,
-                              onTap: () {
-                                context.push('/ticket-details', extra: ticket);
+                            return TweenAnimationBuilder(
+                              tween: Tween<double>(begin: 0, end: 1),
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeOut,
+                              builder: (context, value, child) {
+                                return Opacity(
+                                  opacity: value,
+                                  child: Transform.translate(
+                                    offset: Offset(0, 50 * (1 - value)),
+                                    child: child,
+                                  ),
+                                );
                               },
+                              child: TicketCard(
+                                from: ticket['from']!,
+                                to: ticket['to']!,
+                                date: ticket['date']!,
+                                time: ticket['time']!,
+                                status: ticket['status']!,
+                                passengerName: ticket['passengerName']!,
+                                onTap: () {
+                                  context.push('/ticket-details', extra: ticket);
+                                },
+                              ),
                             );
                           },
                         ),
