@@ -15,8 +15,10 @@ class LoginScreen extends StatelessWidget {
         children: [
           const GeometricBackground(),
           SafeArea(
-            child: Padding( // Appliquer le padding directement au Column
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+            child: Padding(
+              // Appliquer le padding directement au Column
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -60,21 +62,23 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16), // Réduit
-                                LoadingButton(
-                                  onPressed: () async {
-                                    // TODO: Implement actual login logic
-                                    // For now, we just navigate to home on button press after the delay.
-                                    context.go('/home');
-                                  },
-                                  text: 'Connexion',
-                                ),                  const SizedBox(height: 16), // Réduit
+                  LoadingButton(
+                    onPressed: () async {
+                      // TODO: Implement actual login logic
+                      // For now, we just navigate to home on button press after the delay.
+                      context.go('/home');
+                    },
+                    text: 'Connexion',
+                  ),
+                  const SizedBox(height: 16), // Réduit
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Vous n'avez pas de compte ?", style: textTheme.bodyLarge),
+                      Text("Vous n'avez pas de compte ?",
+                          style: textTheme.bodyLarge),
                       TextButton(
                         onPressed: () => context.push('/register'),
-                        child: const Text('Inscrivez-vous'),
+                        child: const Text('S\'inscrire'),
                       ),
                     ],
                   ),

@@ -61,8 +61,8 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(width: w * 0.6, child: AppButton(label: 'Se connecter', onPressed: _onLogin)),
               const SizedBox(height: 14),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Text("Vous n'avez pas encore un compte LK? "),
-                TextButton(onPressed: () => Navigator.pushNamed(context, '/register'), child: const Text('Inscrivez-vous'))
+                const Text("Vous n'avez pas encore un compte ? "),
+                TextButton(onPressed: () => Navigator.pushNamed(context, '/register'), child: const Text('S\'inscrire'))
               ])
             ],
           ),

@@ -14,7 +14,7 @@ class LKTransApp extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
-      title: 'LKTrans',
+      title: 'LK-Trans',
       theme: AppTheme.light(),
     );
   }
