@@ -1,12 +1,14 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lktrans/core/constants/app_colors.dart';
 import 'package:lktrans/core/widgets/geometric_background.dart';
 import 'package:lktrans/core/widgets/loading_button.dart';
-import 'package:lktrans/features/routes/data/route_data.dart'; // Import pour la liste des villes
+import 'package:lktrans/features/routes/data/route_data.dart';
+import 'package:lktrans/features/tickets/presentation/widgets/seat_selection_widget.dart';
 
 class ReservationScreen extends StatefulWidget {
-  final Map<String, dynamic>? routeData; // Optional route data
+  final Map<String, dynamic>? routeData;
 
   const ReservationScreen({super.key, this.routeData});
 
@@ -15,503 +17,428 @@ class ReservationScreen extends StatefulWidget {
 }
 
 class _ReservationScreenState extends State<ReservationScreen> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
+  // ---------------------------------------------------------------------------
+  // CONSTANTES BUSINESS LOGIC
+  // ---------------------------------------------------------------------------
+  static const double basePrice = 3500;
+  static const double extraBaggagePrice = 500;
+  static const int minPassengers = 1;
+  static const int maxPassengers = 10;
+  static const int maxExtraBaggage = 5;
 
-  // Form Keys for each step
-  final _formKeyStep1Manual = GlobalKey<FormState>(); // For manual route entry
-  final _formKeyStep2Passengers = GlobalKey<FormState>(); // For passenger details
-  final _formKeyStep3DateBaggage = GlobalKey<FormState>(); // For date, seats, baggage
+  static const List<String> monthLabels = [
+    'janv.',
+    'févr.',
+    'mars',
+    'avr.',
+    'mai',
+    'juin',
+    'juil.',
+    'août',
+    'sept.',
+    'oct.',
+    'nov.',
+    'déc.'
+  ];
 
-  bool _isForSomeoneElse = false;
+  // ---------------------------------------------------------------------------
+  // FORM STATE
+  // ---------------------------------------------------------------------------
+  final _formKey = GlobalKey<FormState>();
 
-  // Controllers for Passenger Form fields
-  final TextEditingController _passengerNameController = TextEditingController();
-  final TextEditingController _passengerPhoneController = TextEditingController();
-  final TextEditingController _passengerEmailController = TextEditingController();
-  final TextEditingController _otherPassengerNameController = TextEditingController();
-  final TextEditingController _otherPassengerPhoneController = TextEditingController();
-  final TextEditingController _otherPassengerEmailController = TextEditingController();
-
-  // Variables d'état pour les villes (remplacent les TextEditingController)
   String? _selectedDepartureCity;
   String? _selectedDestinationCity;
-  String? _selectedNumberOfPassengers; // Ajouté pour le nombre de passagers
+  late final TextEditingController _passengerNameController;
+  late final TextEditingController _passengerPhoneController;
+  late final TextEditingController _departureDateController;
 
-  // Controllers existants
-  final TextEditingController _departureDateController = TextEditingController();
-  final TextEditingController _numberOfSeatsController = TextEditingController(); // Ceci sera le nombre de passagers
+  int _passengerCount = minPassengers;
+  int _extraBaggageCount = 0;
+  Set<int> _selectedSeats = {};
 
-  // Baggage Photo Simulation
-  final List<String> _baggagePhotos = []; // Store placeholder image paths
-
-  // Pre-fill from routeData if provided
   @override
   void initState() {
     super.initState();
+
+    _passengerNameController = TextEditingController();
+    _passengerPhoneController = TextEditingController();
+    _departureDateController = TextEditingController(
+      text: _formattedDate(DateTime.now()),
+    );
+
     if (widget.routeData != null) {
       _selectedDepartureCity = widget.routeData!['from'];
       _selectedDestinationCity = widget.routeData!['to'];
     }
-    // Mock data for initial date
-    _departureDateController.text = '25 déc. 2025';
-    _numberOfSeatsController.text = '1';
-    _selectedNumberOfPassengers = '1'; // Initialisation
   }
 
   @override
   void dispose() {
     _passengerNameController.dispose();
     _passengerPhoneController.dispose();
-    _passengerEmailController.dispose();
-    _otherPassengerNameController.dispose();
-    _otherPassengerPhoneController.dispose();
-    _otherPassengerEmailController.dispose();
-    // _departureCityController.dispose(); // Plus nécessaire
-    // _destinationCityController.dispose(); // Plus nécessaire
     _departureDateController.dispose();
-    _numberOfSeatsController.dispose();
     super.dispose();
   }
 
-  // Determine if manual route entry step is needed
-  bool get _needsManualRouteEntry => widget.routeData == null;
+  // ---------------------------------------------------------------------------
+  // GETTERS UTILES
+  // ---------------------------------------------------------------------------
+  bool get needsManualRouteEntry => widget.routeData == null;
 
-  int get _totalSteps => _needsManualRouteEntry ? 3 : 2;
+  bool get areSeatsValid => _selectedSeats.length == _passengerCount;
 
-  void _nextPage() {
-    bool isValid = false;
-    if (_needsManualRouteEntry) {
-      if (_currentPage == 0) {
-        isValid = _formKeyStep1Manual.currentState?.validate() ?? false;
-      } else if (_currentPage == 1) {
-        isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
-      } else if (_currentPage == 2) {
-        isValid = _formKeyStep3DateBaggage.currentState?.validate() ?? false;
-      }
-    } else { // Does not need manual route entry
-      if (_currentPage == 0) {
-        isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
-      } else if (_currentPage == 1) {
-        isValid = _formKeyStep3DateBaggage.currentState?.validate() ?? false;
-      }
-    }
-
-    if (isValid) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      );
-    }
+  double get totalPrice {
+    return (basePrice * _passengerCount) +
+        (extraBaggagePrice * _extraBaggageCount);
   }
 
-  void _selectDepartureDate() async {
-    final DateTime? picked = await showDatePicker(
+  // ---------------------------------------------------------------------------
+  // LOGIQUE DATES
+  // ---------------------------------------------------------------------------
+  String _formattedDate(DateTime date) {
+    return "${date.day} ${monthLabels[date.month - 1]} ${date.year}";
+  }
+
+  Future<void> _selectDepartureDate() async {
+    final picked = await showDatePicker(
       context: context,
+      locale: const Locale('fr'),
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: AppColors.textPrimary, // Body text color
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary, // Button text color
-              ),
-            ),
-          ),
-          child: child!,
-        );
-      },
+      builder: (context, child) => Theme(
+        data: ThemeData.light().copyWith(
+          colorScheme: const ColorScheme.light(primary: AppColors.primary),
+        ),
+        child: child!,
+      ),
     );
+
     if (picked != null) {
       setState(() {
-        _departureDateController.text = "${picked.day} ${_getMonthAbbreviation(picked.month)}. ${picked.year}";
+        _departureDateController.text = _formattedDate(picked);
       });
     }
   }
 
-  String _getMonthAbbreviation(int month) {
-    switch (month) {
-      case 1: return 'janv.';
-      case 2: return 'févr.';
-      case 3: return 'mars';
-      case 4: return 'avr.';
-      case 5: return 'mai';
-      case 6: return 'juin';
-      case 7: return 'juil.';
-      case 8: return 'août';
-      case 9: return 'sept.';
-      case 10: return 'oct.';
-      case 11: return 'nov.';
-      case 12: return 'déc.';
-      default: return '';
-    }
-  }
+  // ---------------------------------------------------------------------------
+  // SEAT SELECTION
+  // ---------------------------------------------------------------------------
+  Future<void> _showSeatSelector() async {
+    final Set<int>? result = await showModalBottomSheet<Set<int>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.8,
+        maxChildSize: 0.9,
+        minChildSize: 0.5,
+        builder: (context, scrollController) {
+          return SeatSelectionWidget(
+            seatsToSelect: _passengerCount,
+            initialSelectedSeats: _selectedSeats,
+            unavailableSeats: const {1, 5, 10, 15, 22, 23},
+          );
+        },
+      ),
+    );
 
-  void _addBaggagePhoto() {
-    if (_baggagePhotos.length < 8) {
+    if (result != null) {
       setState(() {
-        _baggagePhotos.add('assets/images/bus_sample.jpg'); // Simulate image added
+        _selectedSeats = result;
       });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Maximum 8 photos de bagages.')),
-      );
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // VALIDATION GLOBALE
+  // ---------------------------------------------------------------------------
+  Future<void> _finalizeReservation() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    if (!areSeatsValid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Veuillez sélectionner les sièges.")),
+      );
+      return;
+    }
+
+    context.push('/payment', extra: {
+      'from': _selectedDepartureCity,
+      'to': _selectedDestinationCity,
+      'date': _departureDateController.text,
+      'passengers': _passengerCount,
+      'extraBaggage': _extraBaggageCount,
+      'seats': _selectedSeats.toList(),
+      'name': _passengerNameController.text,
+      'phone': _passengerPhoneController.text,
+      'totalAmount': totalPrice,
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // UI
+  // ---------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('Réservation'), // Titre simplifié
+        title: const Text('Réservation'),
+        centerTitle: true,
       ),
       body: Stack(
         children: [
           const GeometricBackground(),
-          SafeArea(
-            child: Column(
-              children: [
-                LinearProgressIndicator(
-                  value: (_currentPage + 1) / _totalSteps, // Calcul de la progression
-                  backgroundColor: AppColors.primary.withOpacity(0.2),
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                ),
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    onPageChanged: (page) {
-                      setState(() {
-                        _currentPage = page;
-                      });
-                    },
-                    children: [
-                      if (_needsManualRouteEntry) _buildStep1ManualRoute(textTheme),
-                      _buildPassengerDetailsForm(textTheme),
-                      _buildDateBaggageForm(textTheme),
-                    ],
-                  ),
-                ),
-                _buildNavigationButtons(),
-              ],
-            ),
-          ),
-
+          SafeArea(bottom: false, child: _buildBody(textTheme)),
+          _buildStickyFooter(textTheme),
         ],
       ),
     );
   }
 
-  // --- Building Steps ---
-  Widget _buildStep1ManualRoute(TextTheme textTheme) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKeyStep1Manual,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Trajet de Voyage', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text('Sélectionnez votre ville de départ et de destination.', style: textTheme.bodyLarge),
-            const SizedBox(height: 24),
-            DropdownButtonFormField<String>(
-              value: _selectedDepartureCity,
-              decoration: const InputDecoration(
-                labelText: 'Ville de Départ',
-                prefixIcon: Icon(Icons.location_on_outlined),
-              ),
-              items: cities.map((String city) {
-                return DropdownMenuItem<String>(
-                  value: city,
-                  child: Text(city),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedDepartureCity = newValue;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Veuillez sélectionner une ville de départ';
-                }
-                return null;
-              },
+  Widget _buildBody(TextTheme textTheme) {
+    return Form(
+      key: _formKey,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              border: Border.all(color: Colors.white.withOpacity(0.3)),
             ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedDestinationCity,
-              decoration: const InputDecoration(
-                labelText: 'Ville de Destination',
-                prefixIcon: Icon(Icons.location_on),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24).copyWith(bottom: 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (needsManualRouteEntry) ...[
+                    _buildSectionTitle(textTheme, 'Trajet', Icons.map),
+                    _buildRouteSelection(),
+                    const SizedBox(height: 24),
+                  ],
+                  _buildSectionTitle(textTheme, 'Options de Voyage', Icons.event_seat),
+                  _buildTravelOptions(textTheme),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle(textTheme, 'Passager Principal', Icons.person),
+                  _buildPassengerInfo(),
+                ],
               ),
-              items: cities.map((String city) {
-                return DropdownMenuItem<String>(
-                  value: city,
-                  child: Text(city),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedDestinationCity = newValue;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Veuillez sélectionner une ville de destination';
-                }
-                if (value == _selectedDepartureCity) {
-                  return 'La ville de destination ne peut pas être la même que la ville de départ';
-                }
-                return null;
-              },
             ),
-            const SizedBox(height: 24),
-            Text('Nombre de passagers', style: textTheme.titleMedium),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: _selectedNumberOfPassengers,
-              decoration: const InputDecoration(
-                labelText: 'Nombre de personnes',
-                prefixIcon: Icon(Icons.people),
-              ),
-              items: List.generate(5, (index) => (index + 1).toString()).map((String number) {
-                return DropdownMenuItem<String>(
-                  value: number,
-                  child: Text(number),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedNumberOfPassengers = newValue;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Veuillez sélectionner le nombre de passagers';
-                }
-                return null;
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-
-  Widget _buildPassengerDetailsForm(TextTheme textTheme) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKeyStep2Passengers,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Informations du Passager', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text('Qui voyagera ?', style: textTheme.bodyLarge),
-            const SizedBox(height: 24),
-            TextFormField(
-              controller: _passengerNameController,
-              decoration: const InputDecoration(labelText: 'Nom et Prénoms', prefixIcon: Icon(Icons.person_outline)),
-              validator: (value) => (value?.isEmpty ?? true) ? 'Ce champ est requis' : null,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _passengerPhoneController,
-              decoration: const InputDecoration(labelText: 'Numéro de Téléphone', prefixIcon: Icon(Icons.phone_outlined)),
-              keyboardType: TextInputType.phone,
-              validator: (value) => (value?.isEmpty ?? true) ? 'Ce champ est requis' : null,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _passengerEmailController,
-              decoration: const InputDecoration(labelText: 'Email (Optionnel)', prefixIcon: Icon(Icons.email_outlined)),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Checkbox(
-                  value: _isForSomeoneElse,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _isForSomeoneElse = value ?? false;
-                    });
-                  },
-                  activeColor: AppColors.primary,
-                ),
-                Text('Réserver pour quelqu\'un d\'autre ?', style: textTheme.bodyLarge),
-              ],
-            ),
-            if (_isForSomeoneElse) ...[
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _otherPassengerNameController,
-                decoration: const InputDecoration(labelText: 'Nom et Prénoms (Autre passager)', prefixIcon: Icon(Icons.person_outline)),
-                validator: (value) => (value?.isEmpty ?? true) ? 'Ce champ est requis' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _otherPassengerPhoneController,
-                decoration: const InputDecoration(labelText: 'Numéro de Téléphone (Autre passager)', prefixIcon: Icon(Icons.phone_outlined)),
-                keyboardType: TextInputType.phone,
-                validator: (value) => (value?.isEmpty ?? true) ? 'Ce champ est requis' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _otherPassengerEmailController,
-                decoration: const InputDecoration(labelText: 'Email (Autre passager - Optionnel)', prefixIcon: Icon(Icons.email_outlined)),
-                keyboardType: TextInputType.emailAddress,
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-
-  Widget _buildDateBaggageForm(TextTheme textTheme) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKeyStep3DateBaggage,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Date & Bagages', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text('Choisissez la date et ajoutez les photos de vos bagages.', style: textTheme.bodyLarge),
-            const SizedBox(height: 24),
-            TextFormField(
-              controller: _departureDateController,
-              readOnly: true,
-              onTap: _selectDepartureDate,
-              decoration: const InputDecoration(
-                labelText: 'Date de Départ',
-                prefixIcon: Icon(Icons.calendar_today),
-              ),
-              validator: (value) => (value?.isEmpty ?? true) ? 'Ce champ est requis' : null,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _numberOfSeatsController,
-              decoration: const InputDecoration(
-                labelText: 'Nombre de personnes',
-                prefixIcon: Icon(Icons.people),
-              ),
-              keyboardType: TextInputType.number,
-              validator: (value) => (value?.isEmpty ?? true) ? 'Ce champ est requis' : null,
-            ),
-            const SizedBox(height: 24),
-            Text('Photos des Bagages (Max 8)', style: textTheme.titleMedium),
-            const SizedBox(height: 16),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: _baggagePhotos.length + 1, // +1 for add button
-              itemBuilder: (context, index) {
-                if (index == _baggagePhotos.length) {
-                  return InkWell(
-                    onTap: _addBaggagePhoto,
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey.shade400),
-                      ),
-                      child: const Icon(Icons.add_a_photo, color: Colors.grey),
-                    ),
-                  );
-                }
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(
-                      image: AssetImage(_baggagePhotos[index]),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavigationButtons() {
+  Widget _buildSectionTitle(TextTheme textTheme, String title, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          if (_currentPage > 0)
-            TextButton(
-              onPressed: () {
-                _pageController.previousPage(
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                );
-              },
-              child: const Text('Précédent'),
-            ),
-          const Spacer(),
-          SizedBox(
-            width: 150,
-            child: LoadingButton(
-              onPressed: () async {
-                bool isValid = false;
-                if (_needsManualRouteEntry) {
-                  if (_currentPage == 0) {
-                    isValid = _formKeyStep1Manual.currentState?.validate() ?? false;
-                  } else if (_currentPage == 1) {
-                    isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
-                  } else if (_currentPage == 2) {
-                    isValid = _formKeyStep3DateBaggage.currentState?.validate() ?? false;
-                  }
-                } else { // Does not need manual route entry
-                  if (_currentPage == 0) {
-                    isValid = _formKeyStep2Passengers.currentState?.validate() ?? false;
-                  } else if (_currentPage == 1) {
-                    isValid = _formKeyStep3DateBaggage.currentState?.validate() ?? false;
-                  }
-                }
-
-                if (isValid) {
-                  if (_currentPage < (_totalSteps - 1)) {
-                    _pageController.nextPage(
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                    );
-                  } else {
-                    // Last step: Navigate to payment
-                    context.push('/payment');
-                  }
-                }
-              },
-              text: _currentPage < (_totalSteps - 1) ? 'Suivant' : 'Finaliser',
+          Icon(icon, size: 20, color: AppColors.textPrimary),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: textTheme.titleLarge?.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRouteSelection() {
+    return Column(
+      children: [
+        DropdownButtonFormField<String>(
+          value: _selectedDepartureCity,
+          items: cities.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+          decoration: _glassyInputDecoration('Ville de Départ'),
+          onChanged: (v) => setState(() => _selectedDepartureCity = v),
+          validator: (v) => v == null ? 'Champ requis' : null,
+        ),
+        const SizedBox(height: 16),
+        DropdownButtonFormField<String>(
+          value: _selectedDestinationCity,
+          items: cities.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+          decoration: _glassyInputDecoration('Ville de Destination'),
+          onChanged: (v) => setState(() => _selectedDestinationCity = v),
+          validator: (v) => v == null ? 'Champ requis' : null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTravelOptions(TextTheme textTheme) {
+    return Column(
+      children: [
+        TextFormField(
+          controller: _departureDateController,
+          readOnly: true,
+          onTap: _selectDepartureDate,
+          validator: (v) => v?.isEmpty ?? true ? 'Champ requis' : null,
+          decoration: _glassyInputDecoration('Date de Départ', hasIcon: false),
+        ),
+        const SizedBox(height: 16),
+        _buildStepper(textTheme, 'Passagers', _passengerCount, minPassengers, maxPassengers,
+            (v) => setState(() => _passengerCount = v)),
+        const SizedBox(height: 16),
+        _buildStepper(textTheme, 'Bagages Supplémentaires', _extraBaggageCount, 0, maxExtraBaggage,
+            (v) => setState(() => _extraBaggageCount = v)),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: _showSeatSelector,
+          icon: const Icon(Icons.chair_outlined, color: AppColors.textPrimary),
+          label: Text(
+            'Choisir les sièges (${_selectedSeats.length}/$_passengerCount sélectionnés)',
+            style: const TextStyle(color: AppColors.textPrimary),
+          ),
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            side: BorderSide(color: AppColors.textPrimary.withOpacity(0.5)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPassengerInfo() {
+    return Column(
+      children: [
+        TextFormField(
+          controller: _passengerNameController,
+          decoration: _glassyInputDecoration('Nom et Prénoms', hasIcon: false),
+          validator: (v) => v?.isEmpty ?? true ? 'Champ requis' : null,
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _passengerPhoneController,
+          decoration: _glassyInputDecoration('Numéro de Téléphone', hasIcon: false),
+          keyboardType: TextInputType.phone,
+          validator: (v) => v?.isEmpty ?? true ? 'Champ requis' : null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepper(
+    TextTheme textTheme,
+    String label,
+    int value,
+    int min,
+    int max,
+    ValueChanged<int> onChanged,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary)),
+        Row(
+          children: [
+            IconButton(
+              onPressed: value > min ? () => onChanged(value - 1) : null,
+              color: AppColors.textPrimary.withOpacity(value > min ? 1 : 0.4),
+              icon: const Icon(Icons.remove_circle_outline),
+            ),
+            Text(
+              '$value',
+              style: textTheme.titleLarge?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            IconButton(
+              onPressed: value < max ? () => onChanged(value + 1) : null,
+              color: AppColors.textPrimary.withOpacity(value < max ? 1 : 0.4),
+              icon: const Icon(Icons.add_circle_outline),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // STICKY FOOTER
+  // ---------------------------------------------------------------------------
+  Widget _buildStickyFooter(TextTheme textTheme) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.95),
+          borderRadius: const BorderRadius.only(
+            topRight: Radius.circular(24),
+            topLeft: Radius.circular(24),
+          ),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Total', style: textTheme.bodyMedium),
+                Text(
+                  '${totalPrice.toStringAsFixed(0)} FCFA',
+                  style: textTheme.headlineSmall?.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              width: 150,
+              child: LoadingButton(
+                onPressed: _finalizeReservation,
+                text: 'Finaliser',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // COMMON INPUT STYLE
+  // ---------------------------------------------------------------------------
+  InputDecoration _glassyInputDecoration(String label, {bool hasIcon = true}) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: hasIcon
+          ? Icon(Icons.trip_origin, color: AppColors.textPrimary.withOpacity(0.7))
+          : null,
+      filled: true,
+      fillColor: Colors.white.withOpacity(0.3),
+      labelStyle: TextStyle(color: AppColors.textPrimary.withOpacity(0.7)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: Colors.grey.withOpacity(0.4)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.primary),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent),
       ),
     );
   }

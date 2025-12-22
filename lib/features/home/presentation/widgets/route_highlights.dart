@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lktrans/core/constants/app_colors.dart';
+import 'package:lktrans/features/routes/data/route_data.dart'; // Import the route data
 
 class RouteHighlights extends StatelessWidget {
   const RouteHighlights({super.key});
@@ -24,32 +25,21 @@ class RouteHighlights extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        const SingleChildScrollView(
+        SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Row(
-            children: [
-              RouteHighlightCard(
-                imagePath: 'assets/images/bus_sample.jpg', // Placeholder
-                routeName: 'Douala - Yaoundé',
-                price: '3500 FCFA',
-                duration: '4h 30min',
-              ),
-              SizedBox(width: 16),
-              RouteHighlightCard(
-                imagePath: 'assets/images/bus_sample.jpg', // Placeholder
-                routeName: 'Bafoussam - Dschang',
-                price: '1500 FCFA',
-                duration: '1h 15min',
-              ),
-               SizedBox(width: 16),
-              RouteHighlightCard(
-                imagePath: 'assets/images/bus_sample.jpg', // Placeholder
-                routeName: 'Yaoundé - Kribi',
-                price: '4000 FCFA',
-                duration: '3h 30min',
-              ),
-            ],
+            children: routes.take(3).map((route) { // Display first 3 routes
+              return Padding(
+                padding: const EdgeInsets.only(right: 16), // Spacing between cards
+                child: RouteHighlightCard(
+                  imagePath: 'assets/images/bus_sample.jpg', // Placeholder
+                  routeName: '${route.departureCity} - ${route.destinationCity}',
+                  price: '3500 FCFA', // Mock price for now
+                  duration: '4h 30min', // Mock duration for now
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -83,7 +73,7 @@ class RouteHighlightCard extends StatelessWidget {
         child: InkWell(
           onTap: () {
             // Navigate to route details, passing a dummy ID for now
-            context.push('/route-details', extra: 'dummy_route_id');
+            context.push('/route-details', extra: routeName); // Passing routeName as extra
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

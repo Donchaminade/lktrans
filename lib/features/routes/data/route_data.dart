@@ -88,38 +88,38 @@ TimeOfDay _timeOfDayFromString(String timeString) {
 }
 
 final List<String> cities = [
-  'Paris',
-  'Marseille',
-  'Lyon',
-  'Toulouse',
-  'Nice',
-  'Nantes',
-  'Strasbourg',
-  'Montpellier',
-  'Bordeaux',
-  'Lille',
+  'Lomé',
+  'Sokodé',
+  'Kara',
+  'Kpalimé',
+  'Atakpamé',
+  'Dapaong',
+  'Tsévié',
+  'Aneho',
+  'Mango',
+  'Bafilo',
 ];
 
 final List<RouteData> routes = [
   RouteData(
-    departureCity: 'Paris',
-    destinationCity: 'Marseille',
-    stops: ['Lyon'],
+    departureCity: 'Lomé',
+    destinationCity: 'Sokodé',
+    stops: ['Atakpamé'],
   ),
   RouteData(
-    departureCity: 'Lyon',
-    destinationCity: 'Paris',
+    departureCity: 'Sokodé',
+    destinationCity: 'Lomé',
+    stops: ['Kara'],
+  ),
+  RouteData(
+    departureCity: 'Lomé',
+    destinationCity: 'Kpalimé',
     stops: [],
   ),
   RouteData(
-    departureCity: 'Paris',
-    destinationCity: 'Lille',
-    stops: [],
-  ),
-  RouteData(
-    departureCity: 'Bordeaux',
-    destinationCity: 'Paris',
-    stops: ['Nantes'],
+    departureCity: 'Kara',
+    destinationCity: 'Dapaong',
+    stops: ['Mango'],
   ),
 ];
 

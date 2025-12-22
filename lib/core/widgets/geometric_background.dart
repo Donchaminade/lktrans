@@ -9,6 +9,9 @@ class GeometricBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+        ),
         Positioned(
           top: -120,
           left: -120,

@@ -1,0 +1,3 @@
+applique toujours le slivers
+pour les formulaire, met cette forme transparente comme pour detail trajet
+applique le loader quand il le faut
