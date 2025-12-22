@@ -63,11 +63,16 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary, size: 28),
           ),
           const SizedBox(width: 8),
-          const Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundImage: AssetImage('assets/images/bus_sample.jpg'), // Placeholder image
+          InkWell(
+            onTap: () {
+              context.push('/profile');
+            },
+            child: const Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(
+                radius: 20,
+                backgroundImage: AssetImage('assets/images/bus_sample.jpg'), // Placeholder image
+              ),
             ),
           ),
         ],

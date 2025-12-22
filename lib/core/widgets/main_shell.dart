@@ -22,11 +22,8 @@ class _MainShellState extends State<MainShell> {
     if (location.startsWith('/routes')) {
       return 2;
     }
-    if (location.startsWith('/profile')) { // Added profile
-      return 3;
-    }
     if (location.startsWith('/history')) {
-      return 4;
+      return 3;
     }
     return 0;
   }
@@ -43,9 +40,6 @@ class _MainShellState extends State<MainShell> {
         context.go('/routes');
         break;
       case 3:
-        context.go('/profile'); // Added profile
-        break;
-      case 4:
         context.go('/history');
         break;
     }
@@ -93,11 +87,6 @@ class _MainShellState extends State<MainShell> {
                 icon: Icon(Icons.map_outlined),
                 activeIcon: Icon(Icons.map),
                 label: 'Routes',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline), // Added profile
-                activeIcon: Icon(Icons.person),
-                label: 'Profil',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.history_outlined),
