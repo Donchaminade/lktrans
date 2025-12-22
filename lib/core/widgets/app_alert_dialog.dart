@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lktrans/core/constants/app_colors.dart';
 
-enum AppAlertDialogType { success, error, info }
+enum AppAlertDialogType { success, error, info, warning }
 
 class AppAlertDialog extends StatelessWidget {
   final String title;
@@ -27,6 +27,8 @@ class AppAlertDialog extends StatelessWidget {
         return Icons.error_outline;
       case AppAlertDialogType.info:
         return Icons.info_outline;
+      case AppAlertDialogType.warning:
+        return Icons.warning_amber_outlined;
     }
   }
 
@@ -38,6 +40,8 @@ class AppAlertDialog extends StatelessWidget {
         return Colors.red;
       case AppAlertDialogType.info:
         return AppColors.primary;
+      case AppAlertDialogType.warning:
+        return Colors.orange;
     }
   }
 

@@ -15,6 +15,9 @@ import 'package:lktrans/features/tickets/presentation/screens/payment_screen.dar
 import 'package:lktrans/features/tickets/presentation/screens/reservation_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/ticket_detail_screen.dart';
 import 'package:lktrans/features/tickets/presentation/screens/tickets_screen.dart';
+import 'package:lktrans/features/profile/presentation/screens/profile_screen.dart';
+import 'package:lktrans/features/profile/presentation/screens/profile_details_screen.dart'; // New import
+import 'package:lktrans/features/settings/presentation/screens/app_settings_screen.dart'; // New import
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -74,6 +77,10 @@ final GoRouter appRouter = GoRouter(
           builder: (BuildContext context, GoRouterState state) => const TicketsScreen(),
         ),
         GoRoute(
+          path: '/profile',
+          builder: (BuildContext context, GoRouterState state) => const ProfileScreen(),
+        ),
+        GoRoute(
           path: '/history', // Route pour les statistiques
           builder: (BuildContext context, GoRouterState state) => const StatisticsScreen(),
         ),
@@ -124,6 +131,22 @@ final GoRouter appRouter = GoRouter(
         context: context,
         state: state,
         child: const ConfirmationScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/profile-details', // New route
+      pageBuilder: (context, state) => _buildPageWithFadeTransition(
+        context: context,
+        state: state,
+        child: const ProfileDetailsScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/app-settings', // New route
+      pageBuilder: (context, state) => _buildPageWithFadeTransition(
+        context: context,
+        state: state,
+        child: const AppSettingsScreen(),
       ),
     ),
   ],
